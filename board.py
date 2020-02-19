@@ -1,4 +1,5 @@
 import blocks
+import cell
 import copy
 
 
@@ -19,6 +20,9 @@ class Position:
 	def getBottom(self):
 		return Pos(self.x, self.y + 1)
 
+	def getRelativePos(self, x, y):
+		return Pos((self.x + x), (self.y + y))
+
 
 Pos = Position
 
@@ -27,18 +31,18 @@ class Board(blocks.Block):
 	def __init__(self, width, height):
 		mainBoard = [[blocks.E for _ in range(width)] for _ in range(height)]
 		super().__init__(mainBoard)
-		self.board = self.block
+		self.board = self.block  # alias
 
 	def __str__(self):
-		return "\n".join(list(map("".join, self.board))).replace(" ", "_")
+		return "\n".join(map(lambda row : "".join(map(cell.Cell.getTile, row)), self.board)).replace(" ", "_")
 
 	def isThereCollision(self, block, position):
 		try:
 			for y in range(block.height):
 				for x in range(block.width):
-					if (position.x < 0) or (block.isCellFull(x, y) and self.board[y + position.y][x + position.x] == blocks.X):
+					if (position.x < 0) or (block.isCellFull(x, y) and self.isCellFull((x + position.x), (y + position.y))):
 						return True
-		except IndexError:  # bottom
+		except IndexError:  # bottom or right
 			return True
 		return False
 
@@ -112,9 +116,9 @@ class BlockBoard(Board):
 		"""
 		top-left is the center of rotation
 		"""
-		transposeBlock = blocks.Block(self.activeBlock.getTranspose())
-		if not self.isThereCollision(transposeBlock, self.blockPosition):
-			self.activeBlock = transposeBlock
+		self.activeBlock.getTranspose()
+		if self.isThereCollision(self.activeBlock, self.blockPosition):
+			self.activeBlock.transposeBlockBack()
 
 
 if __name__ == "__main__":

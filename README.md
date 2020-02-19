@@ -2,7 +2,9 @@
 
 A simple Tetris game that runs on terminal.
 
-Just run `python3 tet.py`
+Requires `Python 3.6` or higher.
+
+Just run `python3 tetris.py`
 
 ## Keys
 
